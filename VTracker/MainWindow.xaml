@@ -1,0 +1,524 @@
+﻿<Window x:Class="VTracker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VTracker"
+        mc:Ignorable="d"
+        Title="MainWindow" WindowStartupLocation="CenterScreen" WindowStyle="None" WindowState="Normal" ResizeMode="NoResize" Height="600" Width="1200">
+    <Window.Resources>
+        <Style x:Key="MIN_ListViewContainerStyle" TargetType="{x:Type ListViewItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" TargetName="Bd" Value="Transparent"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="MyWaterMarkStyle" TargetType="{x:Type TextBox}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Grid>
+                            <Border Background="#FF2D2D2D" BorderBrush="#FFFC4754" BorderThickness="2"/>
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="5,0,0,0" VerticalAlignment="Center" />
+                            <Label Margin="5,0,0,0" x:Name="WaterMarkLabel" Content="{TemplateBinding Tag}" VerticalAlignment="Center"
+                               Visibility="Collapsed" Foreground="Gray" FontFamily="Bauhaus 93" FontSize="23" Padding="4,4,0,0"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="Text" Value=""/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Visibility" TargetName="WaterMarkLabel" Value="Visible"/>
+                            </MultiTrigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Foreground" Value="DimGray"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="FocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="2" StrokeDashArray="1 2" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true" StrokeThickness="1"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <SolidColorBrush x:Key="ComboBox.Static.Background" Color="#FF2D2D2D"/>
+        <SolidColorBrush x:Key="ComboBox.Static.Border" Color="#FFFC4754"/>
+        <SolidColorBrush x:Key="ComboBox.Static.Glyph" Color="#FFFC4754"/>
+        <SolidColorBrush x:Key="ComboBox.Static.Editable.Background" Color="#FFFFFFFF"/>
+        <SolidColorBrush x:Key="ComboBox.Static.Editable.Border" Color="#FFABADB3"/>
+        <SolidColorBrush x:Key="ComboBox.Static.Editable.Button.Background" Color="#FF2D2D2D"/>
+        <SolidColorBrush x:Key="ComboBox.MouseOver.Background" Color="#FF2D2D2D"/>
+        <SolidColorBrush x:Key="ComboBox.MouseOver.Border" Color="#FFFD646F"/>
+        <SolidColorBrush x:Key="ComboBox.MouseOver.Glyph" Color="#FFFD646F"/>
+
+        <SolidColorBrush x:Key="ComboBox.Pressed.Border" Color="#FF569DE5"/>
+        <SolidColorBrush x:Key="ComboBox.Pressed.Glyph" Color="#FF000000"/>
+        <SolidColorBrush x:Key="ComboBox.Pressed.Editable.Background" Color="#FFFFFFFF"/>
+        <SolidColorBrush x:Key="ComboBox.Pressed.Editable.Border" Color="#FF569DE5"/>
+        <LinearGradientBrush x:Key="ComboBox.Pressed.Editable.Button.Background" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="#FFDAEBFC" Offset="0.0"/>
+            <GradientStop Color="#FFC4E0FC" Offset="1.0"/>
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="ComboBox.Pressed.Editable.Button.Border" Color="#FF569DE5"/>
+        <SolidColorBrush x:Key="ComboBox.Disabled.Background" Color="#FFF0F0F0"/>
+        <SolidColorBrush x:Key="ComboBox.Disabled.Border" Color="#FFD9D9D9"/>
+        <SolidColorBrush x:Key="ComboBox.Disabled.Glyph" Color="#FFBFBFBF"/>
+        <SolidColorBrush x:Key="ComboBox.Disabled.Editable.Background" Color="#FFFFFFFF"/>
+        <SolidColorBrush x:Key="ComboBox.Disabled.Editable.Border" Color="#FFBFBFBF"/>
+        <SolidColorBrush x:Key="ComboBox.Disabled.Editable.Button.Background" Color="Transparent"/>
+        <SolidColorBrush x:Key="ComboBox.Disabled.Editable.Button.Border" Color="Transparent"/>
+        <Style x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="IsTabStop" Value="false"/>
+            <Setter Property="Focusable" Value="false"/>
+            <Setter Property="ClickMode" Value="Press"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border x:Name="templateRoot" Background="{StaticResource ComboBox.Static.Background}" BorderBrush="{StaticResource ComboBox.Static.Border}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true">
+                            <Border x:Name="splitBorder" BorderBrush="Transparent" BorderThickness="1" HorizontalAlignment="Right" Margin="0" SnapsToDevicePixels="true" Width="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}">
+                                <Path x:Name="arrow" Data="F1 M 0,0 L 2.667,2.66665 L 5.3334,0 L 5.3334,-1.78168 L 2.6667,0.88501 L0,-1.78168 L0,0 Z" Fill="{StaticResource ComboBox.Static.Glyph}" HorizontalAlignment="Center" Margin="0" VerticalAlignment="Center"/>
+                            </Border>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}" Value="true"/>
+                                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="false"/>
+                                    <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource Self}}" Value="false"/>
+                                    <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}" Value="true"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource ComboBox.Static.Editable.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource ComboBox.Static.Editable.Border}"/>
+                                <Setter Property="Background" TargetName="splitBorder" Value="{StaticResource ComboBox.Static.Editable.Button.Background}"/>
+                            </MultiDataTrigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Fill" TargetName="arrow" Value="{StaticResource ComboBox.MouseOver.Glyph}"/>
+                            </Trigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="true"/>
+                                    <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}" Value="false"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource ComboBox.MouseOver.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource ComboBox.MouseOver.Border}"/>
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="true"/>
+                                    <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}" Value="true"/>
+                                </MultiDataTrigger.Conditions>
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource Self}}" Value="true"/>
+                                    <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}" Value="false"/>
+                                </MultiDataTrigger.Conditions>
+
+                                <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource ComboBox.Pressed.Border}"/>
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsPressed, RelativeSource={RelativeSource Self}}" Value="true"/>
+                                    <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}" Value="true"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource ComboBox.Pressed.Editable.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource ComboBox.Pressed.Editable.Border}"/>
+                                <Setter Property="Background" TargetName="splitBorder" Value="{StaticResource ComboBox.Pressed.Editable.Button.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="splitBorder" Value="{StaticResource ComboBox.Pressed.Editable.Button.Border}"/>
+                            </MultiDataTrigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Fill" TargetName="arrow" Value="{StaticResource ComboBox.Disabled.Glyph}"/>
+                            </Trigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}" Value="false"/>
+                                    <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}" Value="false"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource ComboBox.Disabled.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource ComboBox.Disabled.Border}"/>
+                            </MultiDataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding IsEnabled, RelativeSource={RelativeSource Self}}" Value="false"/>
+                                    <Condition Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}" Value="true"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background" TargetName="templateRoot" Value="{StaticResource ComboBox.Disabled.Editable.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="templateRoot" Value="{StaticResource ComboBox.Disabled.Editable.Border}"/>
+                                <Setter Property="Background" TargetName="splitBorder" Value="{StaticResource ComboBox.Disabled.Editable.Button.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="splitBorder" Value="{StaticResource ComboBox.Disabled.Editable.Button.Border}"/>
+                            </MultiDataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <ControlTemplate x:Key="ComboBoxTemplate" TargetType="{x:Type ComboBox}">
+            <Grid x:Name="templateRoot" SnapsToDevicePixels="true">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition MinWidth="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}" Width="0"/>
+                </Grid.ColumnDefinitions>
+                <Popup x:Name="PART_Popup" AllowsTransparency="true" Grid.ColumnSpan="2" IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Margin="1" Placement="Bottom" PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}">
+                    <Border x:Name="dropDownBorder" Background="#FF2D2D2D" BorderBrush="#FF4C4C4C" BorderThickness="1">
+                        <ScrollViewer x:Name="DropDownScrollViewer">
+                            <Grid x:Name="grid" RenderOptions.ClearTypeHint="Enabled">
+                                <Canvas x:Name="canvas" HorizontalAlignment="Left" Height="0" VerticalAlignment="Top" Width="0">
+                                    <Rectangle x:Name="opaqueRect" Fill="{Binding Background, ElementName=dropDownBorder}" Height="{Binding ActualHeight, ElementName=dropDownBorder}" Width="{Binding ActualWidth, ElementName=dropDownBorder}"/>
+                                </Canvas>
+                                <ItemsPresenter x:Name="ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Contained" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                            </Grid>
+                        </ScrollViewer>
+                    </Border>
+                </Popup>
+                <ToggleButton x:Name="toggleButton" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Grid.ColumnSpan="2" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ComboBoxToggleButton}"/>
+                <ContentPresenter x:Name="contentPresenter" ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" Content="{TemplateBinding SelectionBoxItem}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" IsHitTestVisible="false" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="HasItems" Value="false">
+                    <Setter Property="Height" TargetName="dropDownBorder" Value="95"/>
+                </Trigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsGrouping" Value="true"/>
+                        <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="false"/>
+                    </MultiTrigger.Conditions>
+                    <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                </MultiTrigger>
+                <Trigger Property="ScrollViewer.CanContentScroll" SourceName="DropDownScrollViewer" Value="false">
+                    <Setter Property="Canvas.Top" TargetName="opaqueRect" Value="{Binding VerticalOffset, ElementName=DropDownScrollViewer}"/>
+                    <Setter Property="Canvas.Left" TargetName="opaqueRect" Value="{Binding HorizontalOffset, ElementName=DropDownScrollViewer}"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+        <Style x:Key="CustomComboBox" TargetType="{x:Type ComboBox}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Background" Value="{StaticResource ComboBox.Static.Background}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource ComboBox.Static.Border}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="Padding" Value="6,3,5,3"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+            <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
+            <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+            <Setter Property="Template" Value="{StaticResource ComboBoxTemplate}"/>
+        </Style>
+    </Window.Resources>
+    <Window.DataContext>
+        <Binding/>
+    </Window.DataContext>
+    <Grid x:Name="main" Background="#FF2D2D2D" RenderTransformOrigin="0.5,0.5" >
+        <Grid Background="#FF272727" x:Name="GameStandings" Margin="634,33,352,502">
+            <Label Name="TeamRoundsWon" HorizontalContentAlignment="Center" Padding="0,0,0,0" Content="00" FontFamily="Bauhaus 93" FontSize="60" Foreground="#FF93FFA4" Margin="0,-8,136,0"/>
+            <Rectangle Fill="White" Margin="95,32,95,27" d:LayoutOverrides="VerticalAlignment"/>
+            <Label Name="EnemyRoundsWon" HorizontalContentAlignment="Center" Padding="0,0,0,0" Content="00" FontFamily="Bauhaus 93" FontSize="60" Foreground="#FFFF6C6C" Margin="136,-8,0,0"/>
+        </Grid>
+
+        <TextBox x:Name="NameTagField" Style="{StaticResource MyWaterMarkStyle}" FontSize="23" FontFamily="Bauhaus 93" Padding="3,4,0,0" Tag="Player#Tag" Margin="30,39,894,525" Foreground="#FFFC4754" CaretBrush="#FFFC4754" KeyDown="NameTag_KeyDown" LostFocus="NameTagField_LostFocus" GotFocus="NameTagField_GotFocus" TextChanged="NameTagField_TextChanged"/>
+        <Border x:Name="TopBorder" Background="#FF272727" Margin="0,0,0,577" MouseDown="TopBorder_MouseDown">
+            <Label x:Name="TopLabel" Content="ValorantTracker --- Knorke#2234" FontSize="14" Padding="10,0,0,0" VerticalContentAlignment="Center" Foreground="White" FontFamily="Bauhaus 93"/>
+        </Border>
+        <Label Margin="658,294,376,272" Content="No Player Selected" FontSize="18" FontFamily="Bauhaus 93" HorizontalContentAlignment="Center" d:LayoutOverrides="VerticalAlignment">
+            <Label.Foreground>
+                <SolidColorBrush Color="White" Opacity="0.5"/>
+            </Label.Foreground>
+        </Label>
+        <Border x:Name="CloseButton" Background="#FFFC4747" Margin="1181,3,3,581" Cursor="Hand" MouseDown="CloseButton_MouseDown"/>
+        <Border CornerRadius="8" Background="#FF272727" Margin="30,98,894,112">
+            <ListView x:Name="GameCollection" BorderThickness="0" Background="Transparent" SelectionMode="Single" SelectionChanged="GameCollection_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                <Button/>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Foreground" Value="Black"/>
+
+                        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0" />
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Focusable="True" Background="#FF2D2D2D" Width="245" Height="55" HorizontalAlignment="Center" BorderThickness="2" BorderBrush="{Binding Color}" Cursor="Hand">
+                            <Grid>
+                                <Image Source="{Binding MapImageURL}">
+                                    <Image.OpacityMask>
+                                        <ImageBrush ImageSource="{Binding MapImageURL}" Opacity="0.2"/>
+                                    </Image.OpacityMask>
+                                </Image>
+                                <Image Source="Images/MapIcon.png" Margin="58,6,155,27"/>
+                                <Label Content="{Binding Map}" FontSize="18" Foreground="#FFFC4754" FontFamily="Bauhaus 93" Margin="84,2,31,23" Background="{x:Null}" Padding="0,0,0,0"/>
+                                <Label Content="{Binding Time}" FontSize="15" Foreground="Gray" FontFamily="Bauhaus 93" Margin="151,0,0,25"/>
+                                <Image Source="{Binding MyAgentImage}" Margin="0,0,187,0"/>
+                                <Label Content="{Binding KDA}" FontSize="18" Foreground="#FFBFBFBF" FontFamily="Bauhaus 93" Margin="63,25,90,0" Background="{x:Null}" Padding="0,0,0,0"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Border>
+        <Path x:Name="LoadingSymbol" Height="35" Visibility="Hidden" Fill="White" Data="M167 896v-60h130l-15-12q-64-51-93-111t-29-134q0-106 62.5-190.5T387 272v62q-75 29-121 96.5T220 579q0 63 23.5 109.5T307 769l30 21V666h60v230H167Zm407-15v-63q76-29 121-96.5T740 573q0-48-23.5-97.5T655 388l-29-26v124h-60V256h230v60H665l15 14q60 56 90 120t30 123q0 106-62 191T574 881Z" Stretch="Fill" RenderTransformOrigin="0.500,0.500" Margin="150,176,1014,388"/>
+        <Label x:Name="NoPlayerSelectedLabel" Margin="85,272,949,294" Content="No Games" FontSize="18" FontFamily="Bauhaus 93" HorizontalContentAlignment="Center" d:LayoutOverrides="VerticalAlignment">
+            <Label.Foreground>
+                <SolidColorBrush Color="White" Opacity="0.5"/>
+            </Label.Foreground>
+        </Label>
+
+        <Border x:Name="PlayerStatsBox" Background="#FF272727" CornerRadius="8" Margin="328,98,46,22" RenderTransformOrigin="0.507,0.496">
+            <Grid>
+                <RichTextBox x:Name="UsernameBox" Foreground="White" FontSize="32" FontFamily="Bauhaus 93" Margin="413,20,0,414" Width="413" Height="46" FontWeight="Normal" Background="Transparent" BorderThickness="0" Focusable="False" IsHitTestVisible="False"/>
+
+                <Border x:Name="OpenPlayerButton" Background="#FF2D2D2D" Margin="795,7,6,449" BorderThickness="0.7" BorderBrush="#FFFC4754" MouseDown="OpenPlayerButton_MouseDown" Cursor="Hand">
+                    <Path Fill="#FFFC4754" Data="M609.7,10H990v380.3H880.3v-194L346.9,729.7l-76.6-76.6l533.4-533.4h-194V10z M880.3,880.3V500H990v380.3c0,28.9-11.1,54.4-33.2,76.6c-22.1,22.1-47.6,33.2-76.6,33.2H119.7c-30.6,0-56.6-11.1-77.8-33.2C20.6,934.7,10,909.2,10,880.3V119.7c0-28.9,10.6-54.4,31.9-76.6C63.2,21.1,89.1,10,119.7,10H500v109.7H119.7v760.5H880.3z" Stretch="Fill" Height="15" Width="15"/>
+                </Border>
+
+                <Grid ToolTip="Outgoing" Margin="591,236,103,212">
+                    <Image Source="/Images/OutgoingDagame.png" HorizontalAlignment="Left" Width="22" Margin="3,4,0,5"/>
+                    <Label x:Name="OutgoingDamagePlayer" FontFamily="Bauhaus 93" FontSize="20" Foreground="White" Content="Outgoing" Margin="27,0,0,0" Padding="5,2,5,5"/>
+                </Grid>
+
+                <Grid ToolTip="Incoming" Margin="591,272,103,175">
+                    <Image Source="/Images/IncomingDagame.png" HorizontalAlignment="Left" Width="22" Margin="3,4,0,5"/>
+                    <Label x:Name="IncomingDamagePlayer" FontFamily="Bauhaus 93" FontSize="20" Foreground="White" Content="Incoming" Margin="27,0,0,0" Padding="5,2,5,5"/>
+                </Grid>
+
+                <Image x:Name="c_cast_Image" Source="https://media.valorant-api.com/agents/dade69b4-4f5a-8528-247b-219e5a1facd6/abilities/ability1/displayicon.png" Margin="410,231,354,193"/>
+                <Label Name="c_castPerRound" FontFamily="Bauhaus 93" Foreground="White" Content="0.1/Round" Margin="469,229,209,208" FontSize="21"/>
+                <Label Name="c_casts" FontFamily="Bauhaus 93" Foreground="White" Content="20 overall" Margin="474,259,204,177" FontSize="17"/>
+
+                <Image x:Name="q_cast_Image" Source="https://media.valorant-api.com/agents/dade69b4-4f5a-8528-247b-219e5a1facd6/abilities/ability2/displayicon.png" Margin="410,292,354,132"/>
+                <Label Name="q_castPerRound" FontFamily="Bauhaus 93" Foreground="White" Content="0.1/Round" Margin="469,290,209,147" FontSize="21"/>
+                <Label Name="q_casts" FontFamily="Bauhaus 93" Foreground="White" Content="20 overall" Margin="474,320,204,116" FontSize="17"/>
+
+                <Image x:Name="e_cast_Image" Source="https://media.valorant-api.com/agents/dade69b4-4f5a-8528-247b-219e5a1facd6/abilities/grenade/displayicon.png" Margin="410,352,354,72"/>
+                <Label Name="e_castPerRound" FontFamily="Bauhaus 93" Foreground="White" Content="0.1/Round" Margin="469,350,209,87" FontSize="21"/>
+                <Label Name="e_casts" FontFamily="Bauhaus 93" Foreground="White" Content="20 overall" Margin="474,380,204,56" FontSize="17"/>
+
+                <Image x:Name="x_cast_Image" Source="https://media.valorant-api.com/agents/dade69b4-4f5a-8528-247b-219e5a1facd6/abilities/ultimate/displayicon.png" Margin="410,414,354,10"/>
+                <Label Name="x_castPerRound" FontFamily="Bauhaus 93" Foreground="White" Content="0.1/Round" Margin="474,414,204,23" FontSize="21"/>
+                <Label Name="x_casts" FontFamily="Bauhaus 93" Foreground="White" Content="20 overall" Margin="479,444,199,-8" FontSize="17"/>
+
+
+                <Label x:Name="HeadshotPercentageGame" FontFamily="Bauhaus 93" Content="00%" Foreground="LightGreen" FontSize="20" HorizontalContentAlignment="Center" Margin="738,294,0,146"/>
+                <Image Source="/Images/HitPercentage.png" Stretch="Fill" Margin="745,334,7,4" />
+                <Label x:Name="BodyshotPercentageGame" FontFamily="Bauhaus 93" Content="00%" Foreground="#00d8be" FontSize="20"  HorizontalContentAlignment="Center" Margin="667,361,73,85"/>
+
+                <Label x:Name="LegshotPercentageGame" FontFamily="Bauhaus 93" Content="00%" Foreground="#00d8be" FontSize="20"  HorizontalContentAlignment="Center" Margin="667,433,73,15"/>
+
+                <ListView x:Name="PlayerList" Margin="32,32,436,28" SelectionChanged="PlayerList_SelectionChanged">
+
+                    <ListView.Template>
+                        <ControlTemplate>
+                            <Border CornerRadius="8" Background="#FF272727">
+                                <ItemsPresenter></ItemsPresenter>
+                            </Border>
+                        </ControlTemplate>
+                    </ListView.Template>
+                    <Button/>
+                    <Button/>
+                    <Button/>
+                    <Button/>
+                    <Button/>
+                    <Button/>
+                    <Button/>
+                    <Button/>
+                    <Button/>
+                    <Button/>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Foreground" Value="Black"/>
+
+                            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderThickness" Value="0" />
+                                </Trigger>
+                                <Trigger Property="IsFocused" Value="True">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderThickness" Value="0" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{Binding BackroundColor}" Width="348" Height="38" BorderThickness="2" BorderBrush="{Binding BorderColor}" Cursor="Hand">
+                                <Grid>
+                                    <Image Source="{Binding AgentImage}" Stretch="Fill" Margin="0,0,308,0" />
+                                    <Label Content="{Binding Name}" Foreground="#FF2D2D2D" Margin="37,0,177,0" FontFamily="Bauhaus 93" FontSize="22" Padding="5,2.5,5,5"/>
+                                    <Image Source="{Binding RankImage}" Stretch="Fill" Margin="169,0,139,0" />
+                                    <Label Content="{Binding KDA}" FontFamily="Bauhaus 93" FontSize="22" Foreground="#FF2D2D2D" Margin="207,0,0,0" Padding="5,2.5,5,5"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <Border Background="#FF212121" Margin="433,66,267,384">
+                    <Grid>
+                        <ComboBox Template="{DynamicResource ComboBoxTemplate}" x:Name="GraphTypeBox" Style="{DynamicResource CustomComboBox}" Margin="6,4,6,4" Background="#FF2D2D2D" BorderBrush="#FFFC4754" BorderThickness="1" Foreground="White" FontFamily="Bauhaus 93" SelectedIndex="0">
+                            <ComboBoxItem Content="Kills" Foreground="White" FontFamily="Bauhaus 93"/>
+                            <ComboBoxItem Content="moneySpent" Foreground="White" FontFamily="Bauhaus 93"/>
+                            <ComboBoxItem Content="damageMade" Foreground="White" FontFamily="Bauhaus 93"/>
+                        </ComboBox>
+                    </Grid>
+                </Border>
+                <Border Background="#FF212121" Margin="753,66,45,384" Cursor="Hand">
+                    <Path Width="17" Stretch="Fill" Fill="#FFFC4754" Data="M480.008 567.435q29.47 0 50.449-20.987 20.978-20.986 20.978-50.456 0-29.47-20.987-50.449-20.986-20.978-50.456-20.978-29.47 0-50.449 20.987-20.978 20.986-20.978 50.456 0 29.47 20.987 50.449 20.986 20.978 50.456 20.978ZM480 891.5q130.933-119.407 193.434-216.605 62.501-97.198 62.501-170.972 0-115.97-74.099-189.914-74.099-73.944-181.782-73.944t-181.836 73.959q-74.153 73.959-74.153 189.951 0 73.829 64.007 170.908Q352.078 771.961 480 891.5Zm0 89.761Q317.087 842.587 236.511 723.768q-80.576-118.819-80.576-219.799 0-151.845 97.719-241.94 97.719-90.094 226.324-90.094 128.605 0 226.346 90.094 97.741 90.095 97.741 241.94 0 100.98-80.576 219.799T480 981.261ZM480 504Z" HorizontalAlignment="Center" Margin="0,5,0,5"/>
+                </Border>
+                <Border x:Name="GraphObject" Margin="413,96,33,256" CornerRadius="8" Background="#FF212121">
+                    <Grid>
+                        <Path x:Name="HorizontalGrid" Stroke="#FF353535" Stretch="Fill" Margin="21,13,4,23" Data="M 0 1 H 1 M 0 2 H 1 M 0 3 H 1 M 0 4 H 1 M 0 5 H 1 M 0 6 H 1"/>
+                        <Path x:Name="VerticalGrid" Stroke="#FF353535" Stretch="Fill" Margin="21,13,4,23"/>
+
+                        <Label FontSize="15" Width="20" Height="20" Padding="0,0,0,0" Content="0" Foreground="{x:Null}" FontFamily="Bauhaus 93" HorizontalContentAlignment="Center" Margin="363,105,-3,3"/>
+
+                        <Path x:Name="KillPath" Stroke="#FFFC4754" Stretch="Fill" StrokeThickness="2" Margin="21,13,5,23"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+        <Border x:Name="Average_Scores" RenderTransformOrigin="0.5,0.5" Margin="30,502,894,22" Background="#FF272727" CornerRadius="8">
+            <Grid>
+                <Label x:Name="AvergageKDA" FontFamily="Bauhaus 93" Content="Ki/De/As" Foreground="#FFFC4754" FontSize="24" Margin="10,-4,100,44"/>
+
+                <Label x:Name="AverageHeadshotPercentage" Padding="0,0,0,0" FontFamily="Bauhaus 93" Content="00%" Foreground="LightGreen" FontSize="15" Margin="181,10,45,46" HorizontalContentAlignment="Center"/>
+                <Image Source="/Images/HitPercentage.png" Margin="236,11,10,10" Stretch="Fill" d:LayoutOverrides="VerticalAlignment" />
+                <Label x:Name="AverageBodyshotPercentage" FontFamily="Bauhaus 93" Content="00%" Padding="0,0,0,0" Foreground="#00d8be" FontSize="12" Margin="181,35,45,24" HorizontalContentAlignment="Center" RenderTransformOrigin="0.5,0.5" d:LayoutOverrides="VerticalAlignment"/>
+                <Label x:Name="AverageLegshotPercentage" FontFamily="Bauhaus 93" Content="00%" Padding="0,0,0,0" Foreground="#00d8be" FontSize="12" Margin="181,54,45,4" HorizontalContentAlignment="Center" RenderTransformOrigin="0.754,0.557"/>
+
+                <Image Source="/Images/OutgoingDagame.png" HorizontalAlignment="Left" Width="24" Margin="12,31,0,16" Height="29" d:LayoutOverrides="VerticalAlignment"/>
+                <Label ToolTip="Outgoing" x:Name="AverageOutgoing" FontFamily="Bauhaus 93" FontSize="15" Foreground="White" Content="Outgoing" Margin="41,35,100,22" Padding="0,0,0,0" d:LayoutOverrides="VerticalAlignment"/>
+
+                <Image Source="/Images/IncomingDagame.png" HorizontalAlignment="Left" Width="22" Margin="14,52,0,-3" Height="27" d:LayoutOverrides="HorizontalAlignment"/>
+                <Label ToolTip="Incoming" Padding="0,0,0,0" x:Name="AverageIncoming" FontFamily="Bauhaus 93" FontSize="15" Foreground="White" Content="Incoming" Margin="41,54,100,0" d:LayoutOverrides="HorizontalAlignment"/>
+
+            </Grid>
+        </Border>
+        <ListView Visibility="Visible" Background="Transparent" BorderThickness="0" x:Name="TextBoxSuggestions" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="24,74">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid UseLayoutRounding="True" Margin="0,-2.5,0,-2" Width="276"  Height="34" VerticalAlignment="Top" MouseDown="Suggestion_Selected" Cursor="Hand">
+                        <Border BorderThickness="2" BorderBrush="#FF3A3A3A" Background="#FF272727">
+                            <Border.Effect>
+                                <DropShadowEffect ShadowDepth="3" RenderingBias="Quality" Direction="314.4"/>
+                            </Border.Effect>
+                        </Border>
+                        <Label Content="{Binding NameAndTagDisplay}" FontSize="19" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="LightGreen" FontFamily="Bauhaus 93"/>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Foreground" Value="Black"/>
+
+                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="BorderThickness" Value="0" />
+                        </Trigger>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="BorderThickness" Value="0" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <Button/>
+        </ListView>
+        <Label FontSize="13" Content="by NickG" FontFamily="Arial Rounded MT Bold" Foreground="White" Height="25" Margin="1129,575,3,0" Width="68"/>
+
+        <Border Background="#FF272727" BorderThickness="2" BorderBrush="#FFFC4754" Margin="1070,44,94,521" Cursor="Hand" MouseDown="Open_LiveTracker">
+            <Grid>
+                <Path Stretch="Fill" Fill="#FFFC4754" HorizontalAlignment="Center" VerticalAlignment="Center" Height="22" Width="22" Data="m383 706 267-170-267-170v340Zm-53 230v-80H140q-24 0-42-18t-18-42V276q0-24 18-42t42-18h680q24 0 42 18t18 42v520q0 24-18 42t-42 18H630v80H330ZM140 796h680V276H140v520Zm0 0V276v520Z"/>
+            </Grid>
+        </Border>
+        <Rectangle Visibility="Hidden"  x:Name="Overlay" Margin="0,23,0,0">
+            <Rectangle.Fill>
+                <SolidColorBrush Color="#FF272727" Opacity="0.8"/>
+            </Rectangle.Fill>
+        </Rectangle>
+        <Border x:Name="ToggleShop" Background="#FF272727" BorderThickness="2" BorderBrush="#FFFC4754" Margin="1119,44,46,521" Cursor="Hand" MouseDown="ToggleShop_MouseDown">
+            <Path Height="22" Width="22" Fill="#FFFC4754" Data="M286.788 975Q257 975 236 953.788q-21-21.213-21-51Q215 873 236.212 852q21.213-21 51-21Q317 831 338 852.212q21 21.213 21 51Q359 933 337.788 954q-21.213 21-51 21Zm400 0Q657 975 636 953.788q-21-21.213-21-51Q615 873 636.212 852q21.213-21 51-21Q717 831 738 852.212q21 21.213 21 51Q759 933 737.788 954q-21.213 21-51 21ZM235 315l110 228h288l125-228H235Zm-30-60h589.074q22.964 0 34.945 21Q841 297 829 318L694 561q-11 19-28.559 30.5Q647.881 603 627 603H324l-56 104h491v60H277q-42 0-60.5-28t.5-63l64-118-152-322H51v-60h117l37 79Zm140 288h288-288Z" Stretch="Fill"/>
+        </Border>
+        <ListView Visibility="Hidden" x:Name="StoreOffers" ItemContainerStyle="{StaticResource MIN_ListViewContainerStyle}" HorizontalContentAlignment="Center" Background="Transparent" BorderThickness="0" Margin="687,120,114,120" Width="399" RenderTransformOrigin ="0.5,0.5">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="2"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Border CornerRadius="20" BorderThickness="4" BorderBrush="#FFFC4754" Width="180" Height="150" Background="#FF232323" Cursor="Hand">
+                        <Grid>
+                            <Image Width="NaN" Source="{Binding Image}" Margin="1,15,1,55"/>
+                            <Label Foreground="White" Content="{Binding Name}" FontSize="16" FontFamily="Bahnschrift SemiBold" Height="26" Margin="0,116,0,0" Width="152"/>
+
+                            <Image Source="https://media.valorant-api.com/currencies/85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741/displayicon.png" Margin="10,93,144,30"/>
+                            <Label Foreground="White" Padding="2,1,0,0" Content="{Binding Cost}" VerticalAlignment="Center" FontSize="17" FontFamily="Bahnschrift SemiBold" Margin="30,90,74,28"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <Button/>
+            <Button/>
+            <Button/>
+            <Button/>
+        </ListView>
+        <Label Visibility="Hidden" x:Name="Nightmarket_Label" RenderTransformOrigin="0.5,0.5" Content="NIGHTMARKET" FontSize="30" FontFamily="Bauhaus 93" Foreground="#FFFC4754" Margin="30,74,894,480" Height="46" Width="276"/>
+        <ListView Visibility="Hidden" Background="#FF272727" x:Name="NightStoreOffers" ItemContainerStyle="{StaticResource MIN_ListViewContainerStyle}" HorizontalContentAlignment="Center" BorderThickness="2" BorderBrush="#FFFC4754" Margin="30,120,578,120" RenderTransformOrigin ="0.5,0.5" d:LayoutOverrides="HorizontalAlignment">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="3"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Border CornerRadius="20" BorderThickness="4" BorderBrush="#FFFC4754" Width="180" Height="150" Background="#FF232323" Cursor="Hand">
+                        <Grid>
+                            <Image Width="NaN" Source="{Binding Image}" Margin="1,15,1,55"/>
+                            <Label Foreground="White" Content="{Binding Name}" FontSize="16" FontFamily="Bahnschrift SemiBold" Height="26" Margin="0,116,0,0" Width="152"/>
+
+                            <Image Source="https://media.valorant-api.com/currencies/85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741/displayicon.png" Margin="10,93,144,30"/>
+                            <Label Foreground="LightGreen" Padding="0,0,0,0" Content="{Binding DiscountCosts}" FontSize="17" FontFamily="Bahnschrift SemiBold" Margin="33,94,71,30"/>
+                            <Label Foreground="LightGreen" Padding="0,0,0,0" Content="{Binding DiscountPercent}" FontSize="17" FontFamily="Bahnschrift SemiBold" Margin="127,94,3,30"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <Button/>
+            <Button/>
+            <Button/>
+            <Button/>
+            <Button/>
+            <Button/>
+        </ListView>
+    </Grid>
+</Window>
