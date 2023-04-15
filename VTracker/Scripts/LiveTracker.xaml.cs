@@ -101,9 +101,17 @@ namespace VTracker
                 true);
                     Debug.WriteLine(mmrResponse.Content);
                     dynamic rawMMR = JsonConvert.DeserializeObject(mmrResponse.Content);
-                    player.RankTier = rawMMR.Matches[0].TierAfterUpdate;
+                    try
+                    {
+                        player.RankTier = rawMMR.Matches[0].TierAfterUpdate;
+                        player.RR_InRank = rawMMR.Matches[0].RankedRatingAfterUpdate;
+                    }
+                    catch (Exception)
+                    {
+                        player.RankTier = "0";
+                        player.RR_InRank = 0;
+                    }
                     player.RankImage = $"https://media.valorant-api.com/competitivetiers/03621f52-342b-cf4e-4f86-9350a49c6d04/{player.RankTier}/smallicon.png";
-                    player.RR_InRank = rawMMR.Matches[0].RankedRatingAfterUpdate;
                     player.MMRChanges = new List<MMRChange>();
                     foreach (var mmrChange in rawMMR.Matches)
                     {
@@ -147,9 +155,17 @@ namespace VTracker
                     true);
                         Debug.WriteLine(mmrResponse.Content);
                         dynamic rawMMR = JsonConvert.DeserializeObject(mmrResponse.Content);
-                        player.RankTier = rawMMR.Matches[0].TierAfterUpdate;
+                        try
+                        {
+                            player.RankTier = rawMMR.Matches[0].TierAfterUpdate;
+                            player.RR_InRank = rawMMR.Matches[0].RankedRatingAfterUpdate;
+                        }
+                        catch (Exception)
+                        {
+                            player.RankTier = "0";
+                            player.RR_InRank = 0;
+                        }
                         player.RankImage = $"https://media.valorant-api.com/competitivetiers/03621f52-342b-cf4e-4f86-9350a49c6d04/{player.RankTier}/smallicon.png";
-                        player.RR_InRank = rawMMR.Matches[0].RankedRatingAfterUpdate;
                         player.MMRChanges = new List<MMRChange>();
                         foreach (var mmrChange in rawMMR.Matches)
                         {
