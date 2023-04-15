@@ -58,6 +58,7 @@ namespace VTracker
 
             ValAPI.Login();
             RefreshShop();
+            NameTagField.Text = ValAPI.MyData.Name + "#" + ValAPI.MyData.Tag;
 
             TextBoxSuggestions.Items.Clear();
             foreach (var item in ValAPI.GetFriends())

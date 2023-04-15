@@ -26,6 +26,7 @@ namespace VTracker
             InitializeComponent();
 
             PlayerTeamList.Items.Clear();
+            EnemyTeamList.Items.Clear();
             TryAndGetData(puuid);
 
             System.Timers.Timer aTimer = new System.Timers.Timer(1000);
@@ -91,6 +92,9 @@ namespace VTracker
 
                     try { player.Team = item?.TeamID; }
                     catch (Exception) { }
+
+
+                    //bool d = await ValAPI.GetPlayerHistoryAsync(player.puuid, "eu");
 
                     RestResponse mmrResponse = await ValAPI.DoCachedRequestAsync(Method.Get,
                 $"https://pd.{"eu"}.a.pvp.net/mmr/v1/players/{player.puuid}/competitiveupdates?endIndex=10&queue=competitive",
@@ -229,7 +233,10 @@ namespace VTracker
         }
         private void CloseButton_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            MainWindow.Instance.liveTracker = null;
+            if (MainWindow.Instance != null)
+            {
+                MainWindow.Instance.liveTracker = null;
+            }
             Close();
         }
     }      

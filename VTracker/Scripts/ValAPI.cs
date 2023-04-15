@@ -241,6 +241,22 @@ namespace VTracker.ValApi
             catch (Exception){}
             return matches;
         }
+        public static async Task<bool> GetPlayerHistoryAsync(string puuid, string region)
+        {
+            string shard = region;
+
+            if (region == "latam" || region == "br")
+            {
+                shard = "na";
+            }
+            Debug.WriteLine(puuid);
+            var response = await DoCachedRequestAsync(Method.Get,
+               $"https://pd.{shard}.a.pvp.net/mmr/v1/players/{puuid}",
+               true).ConfigureAwait(false);
+            Debug.WriteLine("::::::::::::::::: "+response.Content);
+
+            return false;
+        }
         public static void GetCurrentGame(string player_puuid, string reg, string shard)
         {
             dynamic currentPlayerGame = RemoteCall($"https://glz-{reg}-{shard}.a.pvp.net/core-game/v1/players/{player_puuid}", Method.Get, null, RemoteType.CurrentGame);
