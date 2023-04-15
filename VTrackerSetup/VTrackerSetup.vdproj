@@ -33,6 +33,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_3D5C599282F54017B0CA9746E29708CF"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3EC2B5DEBAB706E84827CD30316E85CC"
         "OwnerKey" = "8:_A67FE9F8AB4B41FB40333AAE7BBA3807"
         "MsmSig" = "8:_UNDEFINED"
@@ -184,12 +190,6 @@
         "Entry"
         {
         "MsmKey" = "8:_A6B65F478DC04890A5D82FE52CACC9C6"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_B092AEEB546C4BC2B127636A388A9345"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -455,6 +455,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3D5C599282F54017B0CA9746E29708CF"
+            {
+            "SourcePath" = "8:..\\..\\..\\..\\Downloads\\VTrackerIcon.ico"
+            "TargetName" = "8:VTrackerIcon.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_E224AD68FD0A45ADA961D35B2314E8DF"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_3EC2B5DEBAB706E84827CD30316E85CC"
@@ -736,26 +756,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B092AEEB546C4BC2B127636A388A9345"
-            {
-            "SourcePath" = "8:..\\..\\..\\..\\Downloads\\VTrackerIcon.ico"
-            "TargetName" = "8:VTrackerIcon.ico"
-            "Tag" = "8:"
-            "Folder" = "8:_E224AD68FD0A45ADA961D35B2314E8DF"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_B79B75EC6C4CB047901B166C41065A6D"
             {
             "AssemblyRegister" = "3:1"
@@ -948,7 +948,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:VTrackerSetup"
         "ProductCode" = "8:{8EADDFDF-33AE-4A43-B535-E27C9326664D}"
-        "PackageCode" = "8:{23C6FA1C-239C-4128-A01A-5018CF7D2B20}"
+        "PackageCode" = "8:{4C7DEFF2-FA4F-4A6D-96F8-5EB0BF1C1A82}"
         "UpgradeCode" = "8:{E9446FD9-99D9-4E72-A1B9-0FD437D09C5F}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
@@ -965,7 +965,7 @@
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:"
         "ARPURLINFOABOUT" = "8:"
-        "ARPPRODUCTICON" = "8:_B092AEEB546C4BC2B127636A388A9345"
+        "ARPPRODUCTICON" = "8:"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
@@ -1068,7 +1068,7 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_1059B6D42D86406A967BDE6F23FEEB4B"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_CE8BACA76B3B4E06B2F302A680DE0823"
             {
             "Name" = "8:VTracker"
             "Arguments" = "8:"
@@ -1079,7 +1079,7 @@
             "Target" = "8:_A6B65F478DC04890A5D82FE52CACC9C6"
             "Folder" = "8:_80D354D5AE2942258134DC0BBBBC08DE"
             "WorkingFolder" = "8:_E224AD68FD0A45ADA961D35B2314E8DF"
-            "Icon" = "8:_B092AEEB546C4BC2B127636A388A9345"
+            "Icon" = "8:"
             "Feature" = "8:"
             }
         }
