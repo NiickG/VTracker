@@ -45,14 +45,21 @@
             <Border x:Name="TopBorder" Background="#FF272727" VerticalAlignment="Top" Height="22" MouseDown="TopBorder_MouseDown">
                 <Label x:Name="TopLabel" Content="LiveTracker" FontSize="14" Padding="10,0,0,0" VerticalContentAlignment="Center" Foreground="White" FontFamily="Bauhaus 93"/>
             </Border>
+            <Border Background="#FF272727" MouseDown="PauseRefreshTimer" Height="30" Width="30" Margin="435,51,531,515" d:LayoutOverrides="Width, Height">
+                <Grid>
+                    <Path x:Name="PlaySymbol" Visibility="Hidden" Width="22" Height="22" Fill="#FFFC4754" Stretch="Uniform" Data="M320 853V293l440 280-440 280Zm60-280Zm0 171 269-171-269-171v342Z"/>
+                    <Path x:Name="PauseSymbol" Width="20" Height="20" Fill="#FFFC4754" Stretch="Uniform" Data="M525 856V296h235v560H525Zm-325 0V296h235v560H200Zm385-60h115V356H585v440Zm-325 0h115V356H260v440Zm0-440v440-440Zm325 0v440-440Z"/>
+                </Grid>
+            </Border>
             <Label x:Name="TimerToNextRequest" Content="15s" FontFamily="Bauhaus 93" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Top" Foreground="White" Margin="0,39,0,0" d:LayoutOverrides="LeftPosition, RightPosition"/>
             <Border x:Name="CloseButton" Background="#FFFC4747" Margin="979,5,5,579" Cursor="Hand" MouseDown="CloseButton_MouseDown"/>
-            <ListView x:Name="PlayerTeamList" ItemContainerStyle="{StaticResource MIN_ListViewContainerStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" BorderThickness="0" Background="Transparent" Margin="31,0,0,0"  Width="315">
+            <ListView x:Name="PlayerTeamList" ItemContainerStyle="{StaticResource MIN_ListViewContainerStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" BorderThickness="0" Background="Transparent" Margin="31,0,0,0"  Width="314">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>
-                            <Rectangle Fill="#FF1EC7B9" HorizontalAlignment="Left" Width="10"/>
-                            <Border Background="#FF272727" Height="82" Width="282" HorizontalAlignment="Left" Margin="21,0,0,0">
+                            <Rectangle Fill="#FF1EC7B9" HorizontalAlignment="Left" Width="4"/>
+                            <Rectangle Fill="{Binding PartyColor}" HorizontalAlignment="Left" Width="4" Margin="4,0,0,0"/>
+                            <Border Background="#FF272727" Height="82" Width="282" HorizontalAlignment="Left" Margin="15,0,0,0">
                                 <Grid>
                                     <Rectangle HorizontalAlignment="Left" Width="76">
                                         <Rectangle.Fill>
@@ -65,7 +72,20 @@
                                     <Image Source="{Binding AgentImage}" HorizontalAlignment="Left" Stretch="UniformToFill" Width="52" Margin="7,14,0,14"/>
                                     <Image Source="{Binding RankImage}" HorizontalAlignment="Left" Stretch="UniformToFill" Width="41" Margin="235,20,0,20"/>
                                     <ProgressBar BorderBrush="#FF404040" BorderThickness="0.9" Value="{Binding RR_InRank}" ToolTip="{Binding RR_InRank}" Foreground="#FFFC4747" Background="#FF272727" Margin="236,62,6,15" RenderTransformOrigin="0.5,0.5" Maximum="100"/>
-                                    <Label Content="{Binding NameAndTag}" Foreground="White" FontSize="16" FontFamily="Bauhaus 93" Margin="60,0,68,50" Height="NaN"/>
+                                    <Label Content="{Binding NameAndTag}" Foreground="White" FontSize="16" FontFamily="Bauhaus 93" Margin="60,0,73,50" Height="NaN"/>
+                                    <Border Cursor="Hand" Background="#FF383838" HorizontalAlignment="Left" Margin="209,8,0,52" Width="22">
+                                        <Label Content="S" Padding="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFFC4754" FontSize="17" FontFamily="Britannic Bold"/>
+                                        <Border.ToolTip>
+                                            <ToolTip Background="#FF383838" BorderBrush="#FFFC4754" BorderThickness="1">
+                                                <Border Width="120" Height="70">
+                                                    <Grid>
+                                                        <Image Source="{Binding VandalImage}" Height="35" VerticalAlignment="Top"/>
+                                                        <Image Source="{Binding PhantomImage}" Height="35" VerticalAlignment="Bottom"/>
+                                                    </Grid>
+                                                </Border>
+                                            </ToolTip>
+                                        </Border.ToolTip>
+                                    </Border>
                                     <ListView ItemsSource="{Binding MMRChanges}" Height="12" Margin="67,33,52,37" ItemContainerStyle="{StaticResource MIN_ListViewContainerStyle}" BorderThickness="0" Background="Transparent" d:LayoutOverrides="VerticalAlignment">
                                         <ListView.ItemTemplate>
                                             <DataTemplate>
@@ -99,17 +119,18 @@
                 <Button/>
                 <Button/>
             </ListView>
-            <ListView x:Name="EnemyTeamList" ItemContainerStyle="{StaticResource MIN_ListViewContainerStyle}" VerticalAlignment="Center" BorderThickness="0" Background="Transparent" Margin="649,0,32,0">
+            <ListView x:Name="EnemyTeamList" ItemContainerStyle="{StaticResource MIN_ListViewContainerStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" BorderThickness="0" Background="Transparent" Margin="649,0,0,0"  Width="314">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid>
-                            <Rectangle Fill="#FFFC4747" HorizontalAlignment="Left" Width="10"/>
-                            <Border Background="#FF272727" Height="82" Width="282" HorizontalAlignment="Left" Margin="21,0,0,0">
+                            <Rectangle Fill="#FFFC4747" HorizontalAlignment="Left" Width="4"/>
+                            <Rectangle Fill="{Binding PartyColor}" HorizontalAlignment="Left" Width="4" Margin="4,0,0,0"/>
+                            <Border Background="#FF272727" Height="82" Width="282" HorizontalAlignment="Left" Margin="15,0,0,0">
                                 <Grid>
                                     <Rectangle HorizontalAlignment="Left" Width="76">
                                         <Rectangle.Fill>
                                             <LinearGradientBrush EndPoint="1,0.5" StartPoint="0,0.5">
-                                                <GradientStop Color="#99FC4747"/>
+                                                <GradientStop Color="#99FC4747" Offset="0"/>
                                                 <GradientStop Color="#0C272727" Offset="1"/>
                                             </LinearGradientBrush>
                                         </Rectangle.Fill>
@@ -117,7 +138,20 @@
                                     <Image Source="{Binding AgentImage}" HorizontalAlignment="Left" Stretch="UniformToFill" Width="52" Margin="7,14,0,14"/>
                                     <Image Source="{Binding RankImage}" HorizontalAlignment="Left" Stretch="UniformToFill" Width="41" Margin="235,20,0,20"/>
                                     <ProgressBar BorderBrush="#FF404040" BorderThickness="0.9" Value="{Binding RR_InRank}" ToolTip="{Binding RR_InRank}" Foreground="#FFFC4747" Background="#FF272727" Margin="236,62,6,15" RenderTransformOrigin="0.5,0.5" Maximum="100"/>
-                                    <Label Content="{Binding NameAndTag}" Foreground="White" FontSize="16" FontFamily="Bauhaus 93" Margin="60,0,68,50" Height="NaN"/>
+                                    <Label Content="{Binding NameAndTag}" Foreground="White" FontSize="16" FontFamily="Bauhaus 93" Margin="60,0,73,50" Height="NaN"/>
+                                    <Border Cursor="Hand" Background="#FF383838" HorizontalAlignment="Left" Margin="209,8,0,52" Width="22">
+                                        <Label Content="S" Padding="0,0,0,0" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#FFFC4754" FontSize="17" FontFamily="Britannic Bold"/>
+                                        <Border.ToolTip>
+                                            <ToolTip Background="#FF383838" BorderBrush="#FFFC4754" BorderThickness="1">
+                                                <Border Width="120" Height="70">
+                                                    <Grid>
+                                                        <Image Source="{Binding VandalImage}" Height="35" VerticalAlignment="Top"/>
+                                                        <Image Source="{Binding PhantomImage}" Height="35" VerticalAlignment="Bottom"/>
+                                                    </Grid>
+                                                </Border>
+                                            </ToolTip>
+                                        </Border.ToolTip>
+                                    </Border>
                                     <ListView ItemsSource="{Binding MMRChanges}" Height="12" Margin="67,33,52,37" ItemContainerStyle="{StaticResource MIN_ListViewContainerStyle}" BorderThickness="0" Background="Transparent" d:LayoutOverrides="VerticalAlignment">
                                         <ListView.ItemTemplate>
                                             <DataTemplate>
@@ -132,13 +166,13 @@
                                             </ItemsPanelTemplate>
                                         </ListView.ItemsPanel>
                                     </ListView>
-                                    <Label VerticalAlignment="Top" HorizontalAlignment="Left" Content="{Binding AverageKDA}" Foreground="White" FontSize="14" FontFamily="Bauhaus 93" Margin="60,45,90,11" Height="NaN"/>
+                                    <Label VerticalAlignment="Top" HorizontalAlignment="Left" Content="{Binding AverageKDA}" Foreground="White" FontSize="14" FontFamily="Bauhaus 93" Margin="60,45,90,11"/>
                                     <Button Content="More Info" Foreground="White" Visibility="{Binding GetHistoryInfoButtonVisibility}" FontFamily="Bauhaus 93" Background="#FF383838" Command="{Binding GetShortHistoryInfo}" Margin="72,50,129,10" Cursor="Hand"/>
                                     <Button Command="{Binding OpenInNew}" Background="#FF383838" Cursor="Hand" Margin="209,50,51,10">
                                         <Path Fill="#FFFC4754" Data="M609.7,10H990v380.3H880.3v-194L346.9,729.7l-76.6-76.6l533.4-533.4h-194V10z M880.3,880.3V500H990v380.3c0,28.9-11.1,54.4-33.2,76.6c-22.1,22.1-47.6,33.2-76.6,33.2H119.7c-30.6,0-56.6-11.1-77.8-33.2C20.6,934.7,10,909.2,10,880.3V119.7c0-28.9,10.6-54.4,31.9-76.6C63.2,21.1,89.1,10,119.7,10H500v109.7H119.7v760.5H880.3z" Stretch="Fill" Height="12" Width="12"/>
                                     </Button>
                                     <Label Content="{Binding SmurfScore}" ToolTip="SmurfScore" Padding="0,0,0,0" HorizontalAlignment="Center" VerticalContentAlignment="Center" Foreground="Violet" FontSize="14" FontFamily="Bauhaus 93" Margin="158,50,78,10" />
-                                    <Label Content="{Binding AccountLevelString}" ToolTip="Level" Padding="0,0,0,0" HorizontalAlignment="Center" VerticalContentAlignment="Center"  Foreground="LightGreen" FontSize="13" FontFamily="Bauhaus 93" Margin="233,0,3,66"/>
+                                    <Label Content="{Binding AccountLevelString}" ToolTip="Level" Padding="0,0,0,0" HorizontalAlignment="Center" VerticalContentAlignment="Center"  Foreground="LightGreen" FontSize="13" FontFamily="Bauhaus 93" Margin="233,0,3,66" />
                                 </Grid>
                             </Border>
                         </Grid>

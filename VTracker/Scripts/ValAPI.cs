@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Windows.Media.TextFormatting;
 
 
 namespace VTracker.ValApi
@@ -29,6 +30,9 @@ namespace VTracker.ValApi
         public static string LockfilePassword;
         public static string LockfilePort;
         public static EntitlementTokens ET;
+
+        public static List<StoreOffer> STORE = new List<StoreOffer>();
+        public static List<NightStoreOffer> NIGHTSTORE = new List<NightStoreOffer>();
 
         static ValAPI()
         {
@@ -102,6 +106,20 @@ namespace VTracker.ValApi
         }
         public static List<StoreOffer> GetStoreOffers(out bool isNightmarket, out List<NightStoreOffer> nightmarketOffers)
         {
+            if (STORE.Count > 0)
+            {
+                if (NIGHTSTORE.Count > 0)
+                {
+                    isNightmarket = true;
+                    nightmarketOffers = NIGHTSTORE;
+                }
+                else
+                {
+                    isNightmarket = false;
+                    nightmarketOffers = new List<NightStoreOffer>();
+                }
+                return STORE;
+            }
             isNightmarket = false;
             List<StoreOffer> offers = new List<StoreOffer>();
 
@@ -133,6 +151,7 @@ namespace VTracker.ValApi
                 catch (Exception){}             
                 offers.Add(so);                
             }
+            STORE = offers;
             List<NightStoreOffer> nightOffers = new List<NightStoreOffer>();
             try
             {
@@ -171,6 +190,7 @@ namespace VTracker.ValApi
 
                 throw;
             }
+            NIGHTSTORE = nightOffers;
             nightmarketOffers = nightOffers;
             return offers;
         }
@@ -218,6 +238,49 @@ namespace VTracker.ValApi
             }
             return _friends;
         }
+        public static async Task<Party> GetPartyFromPUUIDAsync(string puuid, string region)
+        {
+            string shard = region;
+
+            if (region == "latam" || region == "br")
+            {
+                shard = "na";
+            }
+            var client = new RestClient($"https://glz-{shard}-1.{region}.a.pvp.net/parties/v1/players/{puuid}");
+            var request = new RestRequest();
+            request.AddHeader("X-Riot-Entitlements-JWT", ET.EntitlementToken);
+            request.AddHeader("Authorization", $"Bearer {ET.AccessToken}");
+            request.AddHeader("X-Riot-ClientVersion", _gameVersion);
+            var response = await client.ExecuteGetAsync(request).ConfigureAwait(false);
+            if (response.IsSuccessful)
+            {
+                string PartyID = JsonConvert.DeserializeObject<dynamic>(response.Content).CurrentPartyID;
+                client = new RestClient($"https://glz-{shard}-1.{region}.a.pvp.net/parties/v1/parties/{PartyID}");
+                var request2 = new RestRequest();
+                request2.AddHeader("X-Riot-Entitlements-JWT", ET.EntitlementToken);
+                request2.AddHeader("Authorization", $"Bearer {ET.AccessToken}");
+                response = await client.ExecuteGetAsync<dynamic>(request2).ConfigureAwait(false);
+ 
+                dynamic raw = JsonConvert.DeserializeObject<dynamic>(response.Content);
+                Party party = new Party();
+                Debug.WriteLine(response.Content);
+                foreach (var item in raw.Members)
+                {
+                    party.PartyPUUIDs.Add((string)item.Subject);
+                }
+                party.PartyID = PartyID;
+                if (party.PartyPUUIDs.Count > 1)
+                {
+                    party.IsParty = true;
+                }
+                else
+                {
+                    party.IsParty = false;
+                }
+                return party;
+            }
+            return new Party();
+        }
         public static List<dynamic> GetLatestGames(string puuid, string region)
         {
             List<dynamic> matches = new List<dynamic>();
@@ -257,18 +320,36 @@ namespace VTracker.ValApi
 
             return false;
         }
-        public static void GetCurrentGame(string player_puuid, string reg, string shard)
+        public static async Task<List<SkinData>> GetMatchSkinInfoAsync(string LiveMatchID,string region)
         {
-            dynamic currentPlayerGame = RemoteCall($"https://glz-{reg}-{shard}.a.pvp.net/core-game/v1/players/{player_puuid}", Method.Get, null, RemoteType.CurrentGame);
-            string MatchID = currentPlayerGame.MatchID;
+            string shard = region;
 
-            dynamic current_game = RemoteCall($"https://glz-{reg}-{shard}.a.pvp.net/core-game/v1/matches/{MatchID}", Method.Get,null, RemoteType.CurrentGame);
-            foreach (dynamic item in current_game.Players)
+            if (region == "latam" || region == "br")
             {
-                string puuid = item.Subject;
-                Debug.WriteLine(puuid);
+                shard = "na";
             }
-        }
+            var response = await DoCachedRequestAsync(Method.Get,
+                $"https://glz-{shard}-1.{region}.a.pvp.net/core-game/v1/matches/{LiveMatchID}/loadouts",
+                true).ConfigureAwait(false);
+            if (response.IsSuccessful)
+            {
+                List<SkinData> SkinsInMatch = new List<SkinData>();
+                dynamic raw = JsonConvert.DeserializeObject<dynamic>(response.Content);
+                foreach (var player in raw.Loadouts)
+                {
+                    //Dictionary<string, dynamic>
+                    SkinsInMatch.Add(new SkinData()
+                    {
+                        CharacterID = player.CharacterID,
+
+                        VandalImage = $"https://media.valorant-api.com/weaponskinchromas/{player.Loadout.Items["9c82e19d-4575-0200-1a81-3eacf00cf872"].Sockets["3ad1b2b2-acdb-4524-852f-954a76ddae0a"].Item.ID}/fullrender.png",
+                        PhantomImage = $"https://media.valorant-api.com/weaponskinchromas/{player.Loadout.Items["ee8e8d15-496b-07ac-e5f6-8fae5d4c7b1a"].Sockets["3ad1b2b2-acdb-4524-852f-954a76ddae0a"].Item.ID}/fullrender.png"
+                    });
+                }
+                return SkinsInMatch;
+            }
+            return new List<SkinData>();
+        } 
         private static dynamic LocalCall(string endpoint, Method method, object body = null)
         {
             var url = $"https://127.0.0.1:{LockfilePort}{endpoint}";
@@ -288,6 +369,38 @@ namespace VTracker.ValApi
 
             var response = restClient.Execute(request);
             return JsonConvert.DeserializeObject(response.Content);
+        }
+        public static async Task<string> GetNameServiceGetUsernameAsync(string puuid, string reg)
+        {
+            if (puuid == string.Empty) return null;
+            var options = new RestClientOptions(new Uri($"https://pd.{reg}.a.pvp.net/name-service/v2/players"))
+            {
+                RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+            };
+            var client = new RestClient(options);
+            RestRequest request = new RestRequest()
+            {
+                RequestFormat = RestSharp.DataFormat.Json,
+            };
+
+            string[] body = { puuid.ToString() };
+            request.AddJsonBody(body);
+            var response = await client.ExecutePutAsync(request).ConfigureAwait(false);
+            if (response.IsSuccessful)
+                try
+                {
+                    var incorrectContent = response.Content.Replace("[", string.Empty).Replace("]", string.Empty).Replace("\n", string.Empty);
+                    var content = JsonConvert.DeserializeObject<NameServiceResponse>(incorrectContent);
+                    return content.GameName + "#" + content.TagLine;
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine("GetNameServiceGetUsernameAsync Failed: {e}", e);
+                    return "";
+                }
+
+            Debug.WriteLine("GetNameServiceGetUsernameAsync Failed: {e}", response.ErrorException);
+            return "";
         }
         public static dynamic RemoteCall(string url, Method method, object body = null, RemoteType type = RemoteType.None)
         {
@@ -374,7 +487,6 @@ namespace VTracker.ValApi
                 return "";
             }
         }
-
         public static async Task<LiveGameResponse> CheckMatchAsync(string player_puuid, string reg, string shard)
         {
             var client = new RestClient($"https://glz-{reg}-1.{shard}.a.pvp.net/core-game/v1/players/{player_puuid}");

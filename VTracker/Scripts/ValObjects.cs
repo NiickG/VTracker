@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using System.Windows.Media;
 
 namespace VTracker
@@ -24,6 +26,12 @@ namespace VTracker
                 BackroundColor = (SolidColorBrush)convert.ConvertFrom("#7f7f7f");
             }
         }
+    }
+    public class Party
+    {
+        public string PartyID;
+        public List<string> PartyPUUIDs = new List<string>();
+        public bool IsParty = false;
     }
     public class ShortMatchHistoryInfo
     {
@@ -58,6 +66,16 @@ namespace VTracker
 
         public string NameAndTagDisplay { get; set; }
     }
+    public class NameServiceResponse
+    {
+        [JsonPropertyName("DisplayName")] public string DisplayName { get; set; }
+
+        [JsonPropertyName("Subject")] public string Subject { get; set; }
+
+        [JsonPropertyName("GameName")] public string GameName { get; set; }
+
+        [JsonPropertyName("TagLine")] public string TagLine { get; set; }
+    }
     public class StoreOffer
     {
         public string Name { get; set; }
@@ -89,6 +107,13 @@ namespace VTracker
         public string MatchID;
 
         public LiveGameResponseType type;
+    }
+    public class SkinData
+    {
+        public string VandalImage = "";
+        public string PhantomImage = "";
+
+        public string CharacterID = "";
     }
     public enum LiveGameResponseType
     {

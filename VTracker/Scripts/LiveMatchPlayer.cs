@@ -7,13 +7,14 @@ using System.Diagnostics;
 using VTracker.ValApi;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Media;
+using Newtonsoft.Json.Linq;
 
 namespace VTracker
 {
     public class LiveMatchPlayer:INotifyPropertyChanged
     {
         public string NameAndTag { get; set; }
-
         public string RankImage { get; set; }
         public int AccountLevel { get; set; }
         public string AccountLevelString
@@ -41,7 +42,6 @@ namespace VTracker
                 OnPropertyChanged();
             }
         }
-
         private string _AverageKDA;
         public string AverageKDA {
             get
@@ -56,11 +56,51 @@ namespace VTracker
         }
         public List<MMRChange> MMRChanges { get; set; }
         public string AgentImage { get; set; }
+        public string AgentPUUID;
         public string puuid { get; set; }
         public GameInfo.Team Team { get; set; }
         public string MatchID { get; set; }
         public bool hasStarted = false;
 
+        //Party
+        public int PartyID = 0;
+        public Brush _PartyColor { get; set; }
+        public Brush PartyColor
+        {
+            get
+            {
+                return _PartyColor;
+            }
+            set
+            {
+                _PartyColor = value;
+                OnPropertyChanged();
+            }
+        }
+        //Skins
+        public SkinData Skins { get; set;}
+        public string PhantomImage
+        {
+            get
+            {
+                if (Skins != null)
+                {
+                    return Skins.PhantomImage;
+                }
+                return "";
+            }
+        }
+        public string VandalImage
+        {
+            get
+            {
+                if (Skins != null)
+                {
+                    return Skins.VandalImage;
+                }
+                return "";
+            }
+        }
         private Visibility _GetHistoryInfoButtonVisibility;
         public Visibility GetHistoryInfoButtonVisibility 
         {
@@ -74,7 +114,6 @@ namespace VTracker
                 OnPropertyChanged();
             }
         }
-
         private ICommand _GetShortHistoryInfo;
         public ICommand GetShortHistoryInfo
         {
@@ -89,6 +128,29 @@ namespace VTracker
             get
             {
                 return _OpenInNew ?? (_OpenInNew = new CommandHandler(() => OpenInNewWindow(), () => true));
+            }
+        }
+        public void SetPartyColor(int partyID)
+        {
+            PartyID = partyID;
+            var converter = new BrushConverter();
+            switch (PartyID)
+            {
+                case 0:
+                    if (Team == GameInfo.Team.Blue)
+                    {
+                        PartyColor = (Brush)converter.ConvertFromString("#FF1EC7B9");
+                    }
+                    else
+                    {
+                        PartyColor = (Brush)converter.ConvertFromString("#FFFC4747");
+                    }
+                    ; break;
+                case 1: PartyColor = (Brush)converter.ConvertFromString("#FFFFE749");break;
+                case 2: PartyColor = (Brush)converter.ConvertFromString("#FF61FF8F");break;
+                case 3: PartyColor = (Brush)converter.ConvertFromString("#FF7D00FF");break;
+                case 4: PartyColor = (Brush)converter.ConvertFromString("#FF6289FF");break;
+                default: PartyColor = (Brush)converter.ConvertFromString("#FF1EC7B9"); break;
             }
         }
         private async void UpdateHistoryStats()

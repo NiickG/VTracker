@@ -12,7 +12,7 @@ namespace VTracker
         private Action _action;
         private Func<bool> _canExecute;
         public CommandHandler(Action action, Func<bool> canExecute)
-        {
+                    {
             _action = action;
             _canExecute = canExecute;
         }

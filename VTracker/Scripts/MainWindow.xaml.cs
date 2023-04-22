@@ -78,22 +78,22 @@ namespace VTracker
             this.BringIntoView();
             this.Activate();
         }
-        public static void RefreshShop()
+        public void RefreshShop()
         {
-            MainWindow.Instance.StoreOffers.Items.Clear();
+            StoreOffers.Items.Clear();
             List<NightStoreOffer> Nightmarket;
-            List<StoreOffer> offers = ValAPI.GetStoreOffers(out MainWindow.Instance.isNightmarket,out Nightmarket);
+            List<StoreOffer> offers = ValAPI.GetStoreOffers(out isNightmarket,out Nightmarket);
             foreach (var item in offers)
             {
-                MainWindow.Instance.StoreOffers.Items.Add(item);
+                this.StoreOffers.Items.Add(item);
             }
 
-            MainWindow.Instance.NightStoreOffers.Items.Clear();
-            if (MainWindow.Instance.isNightmarket)
+            NightStoreOffers.Items.Clear();
+            if (isNightmarket)
             {
                 foreach (var item in Nightmarket)
                 {
-                    MainWindow.Instance.NightStoreOffers.Items.Add(item);
+                    NightStoreOffers.Items.Add(item);
                 }
             }
 
@@ -271,7 +271,7 @@ namespace VTracker
         {
             public int Compare(GameInfo.GamePlayer x, GameInfo.GamePlayer y)
             {
-                return x.Playerstats.KDAShort.CompareTo(y.Playerstats.KDAShort);
+                return x.Playerstats.score.CompareTo(y.Playerstats.score);
             }
         }
         private void CloseButton_MouseDown(object sender, MouseButtonEventArgs e)
